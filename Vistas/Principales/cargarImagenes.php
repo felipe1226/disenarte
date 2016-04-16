@@ -1,3 +1,12 @@
+<?php 
+  require_once("../../Modelos/Productos/mProducto.php");
+    require_once("../../Modelos/Categorias/mCategoria.php");
+    
+    $categoria = new Categoria();
+    $producto = new Producto();
+
+ ?>
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -54,17 +63,19 @@
                               move_uploaded_file($_FILES['fichero']['tmp_name'], $archivo); 
                               
                               $image = pg_escape_bytea($archivo);
-                              require_once("../../Modelos/Productos/mProducto.php");
+                              
+                              $categoria->cargar_id($_POST['categoria']);
 
-                              $user = new Producto();
+                              $tupla = $categoria->datos();
+                              $id_categoria = $tupla[0];                       
 
-
-                              $user->Crear_Producto(    $_POST['nombre'],
-                                                         $_POST['referencia'], 
-                                                         $_POST['precio'],
-                                                         $_POST['cantidad'],
-                                                         1,
-                                                        $image);
+                              $producto->Crear_Producto(  strtoupper($_POST['nombre']),
+                                                          $_POST['referencia'], 
+                                                          $_POST['precio'],
+                                                          $_POST['cantidad'],
+                                                          1,
+                                                          $image,
+                                                          $id_categoria);
                               }
 
                               ?>
@@ -115,6 +126,17 @@
                                 <input name="referencia" id="referencia" type="text" placeholder="Referencia" />
                                 <input name="precio" id = "precio" type="number" placeholder="Precio" />
                                 <input name="cantidad" id = "cantidad" type="number" placeholder="Cantidad" />
+                                 <select id="categoria" name="categoria" placeholder ="Categoria" >
+                                <option></option>
+                                <?php
+                                $producto->cargar_categoria();
+
+                                while($tupla = $producto->datos()){
+                                    echo '<option>'.$tupla[0].'</option>';
+                                   
+                                }
+                                ?>
+                              </select>
                                     <button name="crear" type="sumbit" class="btn btn-fefault cart">
                                         <i class="fa fa-arrow-circle-o-up"></i>
                                         Crear Producto
